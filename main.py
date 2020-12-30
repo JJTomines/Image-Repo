@@ -4,7 +4,6 @@ from PIL import ImageTk, Image
 from tkinter import filedialog, messagebox, scrolledtext
 from os import remove,listdir
 
-
 def UploadImages(Event=None):
     filelocation = filedialog.askopenfilenames(initialdir="./")
     badfiles = []
@@ -38,6 +37,12 @@ def DeleteImages(Event=None):
 
     userconfirmation = tk.messagebox.askquestion('Confirm choice','Are you sure you want to delete the chosen images?')
 
+    if userconfirmation == "yes":
+        for file in filelocation:
+            remove(file)
+        tk.messagebox.showinfo(title="Success", message="Image has been Deleted!")
+        ListDir()
+
 def IsImage(file):
     try:
         newimg = Image.open(str(file))
@@ -59,18 +64,23 @@ def DisplayImage(file):
 
 def ListDir(Event=None):
     global imagelist
+    imagelist.configure(state="normal")
     images = ""
-    imagelist = scrolledtext.ScrolledText(displayframe, width=90, height=5, font=("Courier", 8))
     for file in listdir("Images"):
         DisplayImage("Images/"+file)
         images += file + "\n"
+    imagelist.delete("1.0", "end")
     imagelist.insert(tk.INSERT,images)
     imagelist.configure(state="disabled")
     imagelist.pack(side="right")
 
-
 def EmptyDir(Event=None):
     userconfirmation = tk.messagebox.askquestion('Confirm choice','Are you sure you want to delete the directory?')
+    if userconfirmation == "yes":
+        for file in listdir("Images"):
+            remove("Images/"+file)
+        tk.messagebox.showinfo(title="Success", message="Image has been Deleted!")
+        DisplayImage("Default.jpg")
 
 def NextImage(Event=None):
     nextimage = False
@@ -142,6 +152,7 @@ uploadimagebutton.pack(side="left",padx=15)
 
 getlistbutton = tk.Button(buttonrow1, text="Display Repository", command=ListDir, width=20)
 getlistbutton.pack(side="left",padx=15)
+imagelist = scrolledtext.ScrolledText(displayframe, width=90, height=5, font=("Courier", 8))
 
 deleteimagebutton = tk.Button(buttonrow2,text="Delete Images", command=DeleteImages, width=20)
 deleteimagebutton.pack(side="left",padx=15)
